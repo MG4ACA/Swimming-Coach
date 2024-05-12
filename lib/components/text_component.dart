@@ -24,7 +24,8 @@ class TextComponent extends StatelessWidget {
         decoration: InputDecoration(
             suffixIcon: suffixIcon,
             enabledBorder: const OutlineInputBorder(
-                borderSide: BorderSide(color: Colors.white, width: 0.0)),
+              borderSide: BorderSide(color: Colors.white, width: 0.0),
+            ),
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
                 borderSide: const BorderSide(style: BorderStyle.solid)),

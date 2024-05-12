@@ -70,10 +70,7 @@ class _MessageScreenState extends State<MessageScreen> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ChatScreen(
-                                      name: userList[index]["fullName"],
-                                      chatRoomId: id,
-                                    ),
+                                    builder: (context) => ChatScreen(),
                                   ));
                             },
                             contentPadding: const EdgeInsets.all(2),
@@ -109,10 +106,13 @@ class _MessageScreenState extends State<MessageScreen> {
           if (doc.data()["email"] == userEmail) {
           } else {
             userList.add(doc.data());
-            docId.add(doc.id);
-            print(doc.id);
+            docId.add("id:${[doc.id]}");
           }
         }
+      },
+    ).onError(
+      (error, stackTrace) {
+        print(error);
       },
     );
   }

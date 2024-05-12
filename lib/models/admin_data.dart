@@ -2,6 +2,7 @@ class AdminData {
   String? token;
   String? email;
   String? selectLevel;
+  String? documentId;
 
   String? dayOneTitle;
   String? dayOneWarmUp;
@@ -37,6 +38,7 @@ class AdminData {
     this.token,
     this.email,
     this.selectLevel,
+    this.documentId,
     this.dayOneTitle,
     this.dayOneWarmUp,
     this.dayOneDrills,
@@ -67,6 +69,7 @@ class AdminData {
       "token": token,
       "userEmail": email,
       "selectLevel": selectLevel,
+      "documentId": documentId,
       "dayOneTitle": dayOneTitle,
       "dayOneWarmUp": dayOneWarmUp,
       "dayOneDrills": dayOneDrills,

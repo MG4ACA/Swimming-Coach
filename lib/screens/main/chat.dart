@@ -3,9 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatScreen extends StatelessWidget {
-  final String? name;
-  final String? chatRoomId;
-  ChatScreen({super.key, this.name, this.chatRoomId});
+  ChatScreen({
+    super.key,
+  });
 
   TextEditingController _message = TextEditingController();
 
@@ -18,11 +18,7 @@ class ChatScreen extends StatelessWidget {
         "message": _message.text,
         "time": FieldValue.serverTimestamp(),
       };
-      await db
-          .collection("ChatRoom")
-          .doc("$chatRoomId")
-          .collection("chats")
-          .add(message);
+      await db.collection("ChatRoom").add(message);
 
       _message.clear();
     }
@@ -32,7 +28,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("$name"),
+        title: Text("Group Chat"),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -45,8 +41,6 @@ class ChatScreen extends StatelessWidget {
               child: StreamBuilder<QuerySnapshot>(
                 stream: db
                     .collection("ChatRoom")
-                    .doc("$chatRoomId")
-                    .collection("chats")
                     .orderBy("time", descending: false)
                     .snapshots(),
                 builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -106,12 +100,57 @@ class ChatScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
         decoration: BoxDecoration(
-            color: Colors.green, borderRadius: BorderRadius.circular(4)),
-        child: Text(
-          map["message"],
-          style: TextStyle(
-              color: Colors.white, fontSize: 16, fontWeight: FontWeight.w700),
-        ),
+            color: map["send"] == FirebaseAuth.instance.currentUser!.email
+                ? Colors.white
+                : Colors.green,
+            borderRadius: BorderRadius.circular(4)),
+        child: map["send"] == FirebaseAuth.instance.currentUser!.email
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    "${map["message"]}",
+                    style: TextStyle(
+                        color: map["send"] ==
+                                FirebaseAuth.instance.currentUser!.email
+                            ? Colors.black
+                            : Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  CircleAvatar(
+                      child: Icon(map["send"] ==
+                              FirebaseAuth.instance.currentUser!.email
+                          ? Icons.person
+                          : Icons.person_outlined)),
+                ],
+              )
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                      child: Icon(map["send"] ==
+                              FirebaseAuth.instance.currentUser!.email
+                          ? Icons.person
+                          : Icons.person_outlined)),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "${map["message"]}",
+                    style: TextStyle(
+                        color: map["send"] ==
+                                FirebaseAuth.instance.currentUser!.email
+                            ? Colors.black
+                            : Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
       ),
     );
   }

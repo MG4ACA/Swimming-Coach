@@ -488,7 +488,6 @@ class _AdminScreenState extends State<AdminScreen> {
       daySixMainSet: daySixMainSet.text.trim(),
       daySixCoolDown: daySixCoolDown.text.trim(),
       daySevenTitle: daySevenTitle.text.trim(),
-      activeStatus: false,
     );
     await db!.collection("Schedule").add(admin.toJson()).then(
         (DocumentReference doc) =>

@@ -29,8 +29,8 @@ class _LoginScreenState extends State<LoginScreen> {
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
-                Colors.blue.shade600,
-                Colors.red.shade700,
+                HexColor('#2E3192'),
+                HexColor('1BFFFF'),
               ],
             ),
           ),
@@ -43,7 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   height: 50,
                 ),
                 const Icon(
-                  Icons.lock_open,
+                  Icons.person,
                   size: 100,
                   color: Colors.white,
                 ),
@@ -153,6 +153,8 @@ class _LoginScreenState extends State<LoginScreen> {
             .then(
           (value) {
             prefS.setString("email", value.user!.email!);
+            email.clear();
+            password.clear();
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -162,13 +164,73 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } on FirebaseAuthException catch (e) {
         if (e.code == 'user-not-found') {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text("User Not Found"),
+                content: Text("No user found for that email."),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text("Ok")),
+                ],
+              );
+            },
+          );
           print('No user found for that email.');
         } else if (e.code == 'wrong-password') {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: Text("Wrong Password"),
+                content: Text("Wrong password provided for that user."),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text("Ok")),
+                ],
+              );
+            },
+          );
           print('Wrong password provided for that user.');
         }
       }
     } else {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Password Field"),
+            content: Text("Password Field Empty"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Ok")),
+            ],
+          );
+        },
+      );
       print('Wrong password provided for that user.');
     }
   }
+}
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll('#', '');
+    if (hexColor.length == 6) {
+      hexColor = 'FF' + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

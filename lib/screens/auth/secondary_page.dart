@@ -51,8 +51,8 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
               begin: Alignment.topRight,
               end: Alignment.bottomLeft,
               colors: [
-                Colors.blue.shade600,
-                Colors.red.shade700,
+                HexColor('#2E3192'),
+                HexColor('1BFFFF'),
               ],
             ),
           ),
@@ -61,7 +61,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
               height: 100,
             ),
             const Icon(
-              Icons.person_3_outlined,
+              Icons.person,
               size: 140,
               color: Colors.white,
             ),
@@ -85,7 +85,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
                         controller: height,
                         keyboardType: TextInputType.number),
                   ),
-                  Text(hw),
+                  Text("cm"),
                 ],
               ),
             ),
@@ -157,12 +157,56 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
       );
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Weak Password"),
+              content: Text("The password provided is too weak."),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Ok")),
+              ],
+            );
+          },
+        );
         print('The password provided is too weak.');
       } else if (e.code == 'email-already-in-use') {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: Text("Email Already In Use"),
+              content: Text("The account already exists for that email."),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Ok")),
+              ],
+            );
+          },
+        );
         print('The account already exists for that email.');
       }
     } catch (e) {
       print(e);
     }
   }
+}
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll('#', '');
+    if (hexColor.length == 6) {
+      hexColor = 'FF' + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }
