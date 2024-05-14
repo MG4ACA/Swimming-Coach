@@ -193,9 +193,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   height: 30,
                 ),
                 ButtonComponent(
-                    onTap: () {
-                      if (checkValidation() &&
-                          password.text.trim() == rePassword.text.trim()) {
+                    onTap: () async {
+                      if (await checkValidation()) {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -279,20 +278,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
-  bool checkValidation() {
+  Future<bool> checkValidation() async {
+    var emilValidation =
+        await ValidationForm.emailValidation(email.text.trim());
     if (ValidationForm.userNameValidation(fullName.text.trim(), "full Name") &&
         ValidationForm.birthDay(birthDay.text.trim(), "Birth Day") &&
-        ValidationForm.emailValidation(email.text.trim()) &&
+        emilValidation &&
         ValidationForm.validateMobile(contactNo.text.trim()) &&
         ValidationForm.addressFieldValidation(address.text.trim(), "Address") &&
-        ValidationForm.passwordValidation(password.text.trim(), "Password")) {
+        ValidationForm.passwordValidation(password.text.trim(), "Password") &&
+        ValidationForm.confirmationPasswordValidation(
+            password.text.trim(), rePassword.text.trim())) {
       return true;
     } else {
       return false;
     }
   }
 }
-
 
 class HexColor extends Color {
   static int _getColorFromHex(String hexColor) {

@@ -67,11 +67,11 @@ class _MessageScreenState extends State<MessageScreen> {
                           padding: const EdgeInsets.all(4.0),
                           child: ListTile(
                             onTap: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ChatScreen(),
-                                  ));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              //       builder: (context) => ChatScreen(),
+                              //     ));
                             },
                             contentPadding: const EdgeInsets.all(2),
                             shape: BeveledRectangleBorder(

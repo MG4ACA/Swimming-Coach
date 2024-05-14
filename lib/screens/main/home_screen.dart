@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mituranga_project/screens/auth/login_screen.dart';
 import 'package:mituranga_project/screens/main/admin_dashboard.dart';
-import 'package:mituranga_project/screens/main/admin_screen.dart';
 import 'package:mituranga_project/screens/main/histrory.dart';
 import 'package:mituranga_project/screens/main/visible_screen.dart';
 
@@ -24,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool loading = false;
   String? documentId;
   String? mainId;
+  bool? mStatus;
 
   @override
   void initState() {
@@ -32,9 +32,9 @@ class _HomeScreenState extends State<HomeScreen> {
     db = FirebaseFirestore.instance;
     userLogin();
   }
+
   @override
   void dispose() {
-    
     super.dispose();
   }
 
@@ -155,13 +155,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 .doc(mainId)
                                                 .update({"status": false})
                                                 .then(
-                                                  (value) => Fluttertoast.showToast(
-                                                      msg:
-                                                          "Training plan deactivated successfully.",
-                                                      toastLength:
-                                                          Toast.LENGTH_LONG),
-                                                )
-                                                .catchError((error) =>
+                                              (value) {
+                                                Fluttertoast.showToast(
+                                                    msg:
+                                                        "Training plan deactivated successfully.",
+                                                    toastLength:
+                                                        Toast.LENGTH_LONG);
+                                                setState(() {});
+                                              },
+                                            ).catchError((error) =>
+                                                    // ignore: invalid_return_type_for_catch_error
                                                     Fluttertoast.showToast(
                                                         msg: "$error",
                                                         toastLength:
@@ -450,7 +453,10 @@ class _HomeScreenState extends State<HomeScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => ChatScreen(),
+                builder: (context) => ChatScreen(
+                  chatStatus: mStatus!,
+                  userType: userType!,
+                ),
               ));
         },
         child: Icon(Icons.message),
@@ -470,8 +476,6 @@ class _HomeScreenState extends State<HomeScreen> {
             if (doc.data()["status"] == true) {
               documentId = doc.data()["documentId"];
               planStatus = doc.data()["status"];
-              print(
-                  "doc data ____________${doc.data()}____${event.docs} __________$planStatus");
               mainId = doc.id;
               return;
               //print(documentId);
@@ -493,6 +497,19 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       });
     }
+    await db!
+        .collection("users")
+        .where("email", isEqualTo: userEmail)
+        .get()
+        .then(
+      (value) {
+        for (var doc in value.docs) {
+          mStatus = doc.data()["mStatus"];
+          userType = doc.data()["type"];
+          print("$mStatus $userType");
+        }
+      },
+    );
   }
 
   void userLogin() async {

@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mituranga_project/models/add.dart';
+import 'package:mituranga_project/screens/main/home_screen.dart';
 
 class VisibleScreen extends StatefulWidget {
   const VisibleScreen({super.key});
@@ -34,7 +35,17 @@ class _VisibleScreenState extends State<VisibleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Choose your training plan"),
-      
+        automaticallyImplyLeading: false,
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(),
+              ));
+        },
+        child: Icon(Icons.arrow_back),
       ),
       body: Column(
         children: [
@@ -148,13 +159,13 @@ class _VisibleScreenState extends State<VisibleScreen> {
                           SizedBox(
                             height: 20,
                           ),
-                          Text(
-                            "Choice you are plan",
-                            style: TextStyle(
-                                fontSize: 20,
-                                color: Colors.black,
-                                fontWeight: FontWeight.w600),
-                          ),
+                          // Text(
+                          //   "Choice you are plan",
+                          //   style: TextStyle(
+                          //       fontSize: 20,
+                          //       color: Colors.black,
+                          //       fontWeight: FontWeight.w600),
+                          // ),
                         ],
                       ),
                     ),

@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class ValidationForm {
+  static FirebaseFirestore? db;
+
   static bool validateMobile(String value) {
     String pattern = r'^(?:7|0|(?:\+94))[0-9]{9}$';
     RegExp regExp = RegExp(pattern);
@@ -9,19 +13,37 @@ class ValidationForm {
       return true;
     } else {
       Fluttertoast.showToast(
-          msg: "Mobile Number is Wrong", toastLength: Toast.LENGTH_LONG);
+          msg: "Enter valid mobile number.", toastLength: Toast.LENGTH_LONG);
     }
     return false;
   }
 
-  static bool emailValidation(String value) {
+  static Future<bool> emailValidation(String value) async {
+    var duplicateEmail = false;
+    
     if (value.isNotEmpty) {
       if (EmailValidator.validate(value)) {
-        return true;
+        db = FirebaseFirestore.instance;
+        await db!.collection("users").get().then((event) {
+          for (var doc in event.docs) {
+            if (doc.data()["email"] == value) {
+              duplicateEmail = true;
+              Fluttertoast.showToast(
+                  msg: "Duplicate email address.",
+                  toastLength: Toast.LENGTH_LONG);
+              return false;
+            }
+          }
+        }).onError((error, stackTrace) {
+          print(error);
+          return false;
+        });
+        return duplicateEmail ? false : true;
+      } else {
+        Fluttertoast.showToast(
+            msg: "Enter valid email address.", toastLength: Toast.LENGTH_LONG);
+        return false;
       }
-      Fluttertoast.showToast(
-          msg: "Email Address is Wrong", toastLength: Toast.LENGTH_LONG);
-      return false;
     } else {
       return false;
     }
@@ -32,7 +54,7 @@ class ValidationForm {
       return true;
     } else {
       Fluttertoast.showToast(
-          msg: "Home Address is Wrong", toastLength: Toast.LENGTH_LONG);
+          msg: "Enter valid address.", toastLength: Toast.LENGTH_LONG);
     }
     return false;
   }
@@ -40,7 +62,8 @@ class ValidationForm {
   static bool userNameValidation(String value, String text) {
     if (value.isEmpty || value.length < 6) {
       Fluttertoast.showToast(
-          msg: "user Name is Wrong", toastLength: Toast.LENGTH_LONG);
+          msg: "Full name must be more than 10 characters.",
+          toastLength: Toast.LENGTH_LONG);
       return false;
     }
     return true;
@@ -53,7 +76,7 @@ class ValidationForm {
       return true;
     } else {
       Fluttertoast.showToast(
-          msg: "Password is Wrong", toastLength: Toast.LENGTH_LONG);
+          msg: "Enter valid password.", toastLength: Toast.LENGTH_LONG);
     }
     return false;
   }
@@ -63,8 +86,18 @@ class ValidationForm {
       return true;
     } else {
       Fluttertoast.showToast(
-          msg: "Birth Day is Wrong", toastLength: Toast.LENGTH_LONG);
+          msg: "Enter valid birthday.", toastLength: Toast.LENGTH_LONG);
     }
     return false;
+  }
+
+  static bool confirmationPasswordValidation(String trim, String s) {
+    if (trim == s) {
+      return true;
+    } else {
+      Fluttertoast.showToast(
+          msg: "Password does not match.", toastLength: Toast.LENGTH_LONG);
+      return false;
+    }
   }
 }

@@ -136,6 +136,7 @@ class _SecondaryScreenState extends State<SecondaryScreen> {
       weight: weight.text.trim(),
       height: height.text.trim(),
       type: false,
+      mStatus: false,
     );
     await db!.collection("users").add(userData.toJson()).then(
         (DocumentReference doc) =>
