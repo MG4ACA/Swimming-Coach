@@ -32,6 +32,11 @@ class _HomeScreenState extends State<HomeScreen> {
     db = FirebaseFirestore.instance;
     userLogin();
   }
+  @override
+  void dispose() {
+    
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,16 +47,6 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
               onPressed: () {
-                FirebaseAuth.instance.signOut();
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const LoginScreen(),
-                    ));
-              },
-              icon: const Icon(Icons.logout_outlined)),
-          IconButton(
-              onPressed: () {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -59,17 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     ));
               },
               icon: const Icon(Icons.history_edu)),
-          loading
-              ? IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AdminScreen(),
-                        ));
-                  },
-                  icon: const Icon(Icons.admin_panel_settings_outlined))
-              : const SizedBox(),
           IconButton(
               onPressed: () {
                 Navigator.push(
@@ -78,13 +62,26 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (context) => const VisibleScreen(),
                     ));
               },
-              icon: const Icon(Icons.more_vert_outlined)),
+              icon: const Icon(Icons.edit_document)),
+          IconButton(
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                    ));
+              },
+              icon: const Icon(Icons.logout_outlined)),
         ],
       ),
       body: RefreshIndicator(
           onRefresh: () async {
             // Reload data when user pulls to refresh
-            await loadData();
+            setState(() {
+              loadData();
+            });
+           
           },
           child: FutureBuilder(
             future: loadData(),

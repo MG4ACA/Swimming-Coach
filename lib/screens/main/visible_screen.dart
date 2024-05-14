@@ -34,6 +34,7 @@ class _VisibleScreenState extends State<VisibleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Choose your training plan"),
+      
       ),
       body: Column(
         children: [
