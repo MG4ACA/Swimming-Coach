@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mituranga_project/components/text_component.dart';
 import 'package:mituranga_project/models/admin_data.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../components/button_component.dart';
 
@@ -490,7 +490,14 @@ class _AdminScreenState extends State<AdminScreen> {
       daySevenTitle: daySevenTitle.text.trim(),
     );
     await db!.collection("Schedule").add(admin.toJson()).then(
-        (DocumentReference doc) =>
-            print('DocumentSnapshot added with ID: ${doc.id}'));
+      (DocumentReference doc) {
+        Fluttertoast.showToast(
+          msg: "Training plan saved successfully.",
+          toastLength: Toast.LENGTH_LONG,
+        );
+        // Redirect back to the previous page
+        Navigator.of(context).pop();
+      },
+    );
   }
 }

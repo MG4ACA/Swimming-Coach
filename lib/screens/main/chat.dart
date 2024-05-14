@@ -2,11 +2,16 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class ChatScreen extends StatelessWidget {
-  ChatScreen({
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({
     super.key,
   });
 
+  @override
+  State<ChatScreen> createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
   TextEditingController _message = TextEditingController();
 
   FirebaseFirestore db = FirebaseFirestore.instance;
@@ -34,9 +39,10 @@ class ChatScreen extends StatelessWidget {
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
+          mainAxisSize: MainAxisSize.max,
           children: [
             Container(
-              height: MediaQuery.of(context).size.height / 2,
+              height: MediaQuery.of(context).size.height / 1.28,
               width: MediaQuery.of(context).size.width,
               child: StreamBuilder<QuerySnapshot>(
                 stream: db
@@ -58,33 +64,37 @@ class ChatScreen extends StatelessWidget {
                 },
               ),
             ),
-          ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        height: MediaQuery.of(context).size.height / 10,
-        width: MediaQuery.of(context).size.width,
-        alignment: Alignment.center,
-        child: Container(
-          height: MediaQuery.of(context).size.height / 12,
-          width: MediaQuery.of(context).size.width / 1.1,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                height: MediaQuery.of(context).size.height / 12,
-                width: MediaQuery.of(context).size.width / 1.5,
-                child: TextField(
-                  controller: _message,
-                  decoration: InputDecoration(
-                      hintText: "send Message",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8))),
+            Container(
+              height: MediaQuery.of(context).size.height / 10,
+              width: MediaQuery.of(context).size.width,
+              alignment: Alignment.center,
+              child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 12,
+                  width: MediaQuery.of(context).size.width / 1.1,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: MediaQuery.of(context).size.height / 12,
+                        width: MediaQuery.of(context).size.width / 1.5,
+                        child: TextField(
+                          controller: _message,
+                          decoration: InputDecoration(
+                              hintText: "send Message",
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8))),
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: onSendMessage, icon: Icon(Icons.send))
+                    ],
+                  ),
                 ),
               ),
-              IconButton(onPressed: onSendMessage, icon: Icon(Icons.send))
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,15 +1,15 @@
 class AddSchedule {
   String? email;
-  String? level;
+  bool? status;
   String? documentId;
 
-  AddSchedule({this.email, this.documentId, this.level});
+  AddSchedule({this.email, this.documentId, this.status});
 
   Map<String, dynamic> toJson() {
     return {
       "email": email,
       "documentId": documentId,
-      "level": level,
+      "status": status,
     };
   }
 }

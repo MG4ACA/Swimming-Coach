@@ -1,12 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mituranga_project/screens/auth/login_screen.dart';
-import 'package:mituranga_project/screens/main/admin_screen.dart';
-import 'package:mituranga_project/screens/main/message.dart';
 import 'package:mituranga_project/screens/main/visible_screen.dart';
-
-import 'chat.dart';
 
 class History extends StatefulWidget {
   const History({super.key});
@@ -23,10 +18,8 @@ class _HistoryState extends State<History> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     db = FirebaseFirestore.instance;
-    loadData();
   }
 
   @override
@@ -119,27 +112,26 @@ class _HistoryState extends State<History> {
           }
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(),
-              ));
-        },
-        child: Icon(Icons.message),
-      ),
     );
   }
 
   Future loadData() async {
     tempList1.clear();
     var userEmail = FirebaseAuth.instance.currentUser!.email;
-    await db!.collection("Choices").get().then((event) {
+    await db!.collection("Choices").get().then((event) async {
       for (var doc in event.docs) {
-        if (doc.data()["userEmail"] == userEmail) {
-          if (doc.data()["activeStatus"] == false) {
-            tempList1.add(doc.data());
+        if (doc.data()["email"] == userEmail) {
+          if (doc.data()["status"] == false) {
+            await db!
+                .collection("Schedule")
+                .doc(doc.data()["documentId"])
+                .get()
+                .then((value) {
+              tempList1.add(value.data());
+
+              print(tempList1.length);
+              // print(value.data());
+            });
           }
         }
       }
@@ -322,14 +314,17 @@ class _HistoryState extends State<History> {
                   Navigator.pop(context);
                 },
                 child: Text("Cancel")),
-            TextButton(
-                onPressed: () async {
-                  await db!.collection("Schedule");
-                },
-                child: Text("Delete"))
           ],
         );
       },
     );
+  }
+
+  Future addData(data) async {
+    await db!.collection("Schedule").doc(data).get().then((value) {
+      tempList1.add(value.data());
+      print(tempList1.length);
+      print(value.data());
+    });
   }
 }

@@ -209,22 +209,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                             ));
                       } else {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: Text("Information"),
-                              content: Text("Enter the correct data"),
-                              actions: [
-                                TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text("ok"))
-                              ],
-                            );
-                          },
-                        );
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (context) {
+                        //     return AlertDialog(
+                        //       title: Text("Information"),
+                        //       content: Text("Enter the correct data"),
+                        //       actions: [
+                        //         TextButton(
+                        //             onPressed: () {
+                        //               Navigator.pop(context);
+                        //             },
+                        //             child: Text("ok"))
+                        //       ],
+                        //     );
+                        //   },
+                        // );
                       }
                     },
                     buttonText: "Next"),

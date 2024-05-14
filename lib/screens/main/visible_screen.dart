@@ -2,8 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:mituranga_project/models/admin_data.dart';
-import 'package:mituranga_project/screens/main/home_screen.dart';
+import 'package:mituranga_project/models/add.dart';
 
 class VisibleScreen extends StatefulWidget {
   const VisibleScreen({super.key});
@@ -14,22 +13,20 @@ class VisibleScreen extends StatefulWidget {
 
 class _VisibleScreenState extends State<VisibleScreen> {
   final item5 = ["Beginner Level", "Intermediate Level", "Professional  Level"];
-  List<Map<String, dynamic>> tempList = [];
+  List tempList = [];
   List tempList2 = [];
   List docId = [];
   String? selectLevel;
   FirebaseFirestore? db;
-  bool? schedule;
-  bool isDropdownOpen = false;
-
-  int? _select;
+  bool? selectSchedule = false;
+  bool? checkSchedule;
+  String? planDocId;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     db = FirebaseFirestore.instance;
-    choiceId();
   }
 
   @override
@@ -37,7 +34,6 @@ class _VisibleScreenState extends State<VisibleScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Choose your training plan"),
-        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
@@ -50,16 +46,11 @@ class _VisibleScreenState extends State<VisibleScreen> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Container(
+                alignment: Alignment.bottomCenter,
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 decoration: BoxDecoration(
                     border: Border.all(width: 1, color: Colors.black),
                     borderRadius: BorderRadius.circular(5)),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isDropdownOpen = !isDropdownOpen;
-                    });
-                  },  
                 child: DropdownButton(
                   underline: const SizedBox(),
                   isExpanded: true,
@@ -71,10 +62,10 @@ class _VisibleScreenState extends State<VisibleScreen> {
                   value: selectLevel,
                   items: item5.map(buildMenuItem5).toList(),
                   onChanged: (value) => setState(() {
+                    selectLevel = "";
                     selectLevel = value;
-                    tempList.clear();
+                    print(selectLevel);
                   }),
-                ),
                 ),
               ),
             ),
@@ -84,46 +75,40 @@ class _VisibleScreenState extends State<VisibleScreen> {
           ),
           Expanded(
             flex: 15,
-            child: selectLevel != null
-                ? FutureBuilder(
-                    future: loadData(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      } else if (snapshot.hasError) {
-                        return const Center(
-                          child: Text("error"),
-                        );
-                      } else {
-                        return ListView.builder(
-                          itemCount: tempList.length,
-                          itemBuilder: (context, index) {
-                            var id = docId[index];
-                            choiceId();
-                            chackShedule(id);
-                            return Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.all(8),
-                                shape: BeveledRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5),
-                                    side: BorderSide(color: Colors.black38)),
+            child: Container(
+              child: selectLevel != null
+                  ? FutureBuilder(
+                      future: loadData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        } else if (snapshot.hasError) {
+                          return const Center(
+                            child: Text("system Error"),
+                          );
+                        } else {
+                          return ListView.builder(
+                            itemCount: tempList.length,
+                            itemBuilder: (context, index) {
+                              dynamic id = docId[index];
+
+                              checkData(id);
+                              return ListTile(
                                 leading: Checkbox(
-                                  value: schedule,
+                                  value: checkSchedule! && selectSchedule!
+                                      ? true
+                                      : false,
                                   onChanged: (value) {
-                                    setState(() {
-                                      if (schedule!) {
-                                        Fluttertoast.showToast(
-                                            msg: "It already exists",
-                                            toastLength: Toast.LENGTH_LONG);
-                                      } else {
-                                        tempList[index]["activeStatus"] =
-                                            value!;
-                                        update(value, id, index);
-                                      }
-                                    });
+                                    if (selectSchedule!) {
+                                      Fluttertoast.showToast(
+                                          msg: "You already have a plan",
+                                          toastLength: Toast.LENGTH_LONG);
+                                    } else {
+                                      setState(() {});
+                                    }
                                   },
                                 ),
                                 title:
@@ -135,7 +120,7 @@ class _VisibleScreenState extends State<VisibleScreen> {
                                 ),
                                 trailing: IconButton(
                                     onPressed: () {
-                                      viewDetails(index);
+                                      viewDetails(index, id);
                                     },
                                     icon: Icon(Icons.view_compact_sharp)),
                                 subtitleTextStyle: TextStyle(
@@ -148,26 +133,33 @@ class _VisibleScreenState extends State<VisibleScreen> {
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold,
                                 ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    },
-                  )
-                : const SizedBox(),
+                              );
+                            },
+                          );
+                        }
+                      },
+                    )
+                  : Container(
+                      alignment: Alignment.center,
+                      child: Column(
+                        children: [
+                          Image.asset("assets/images/aaa.png"),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Text(
+                            "Choice you are plan",
+                            style: TextStyle(
+                                fontSize: 20,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+            ),
           ),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomeScreen(),
-              ));
-        },
-        child: Icon(Icons.arrow_back),
       ),
     );
   }
@@ -179,35 +171,45 @@ class _VisibleScreenState extends State<VisibleScreen> {
 
   Future loadData() async {
     tempList.clear();
-    await db!.collection("Schedule").get().then((event) {
-      for (var doc in event.docs) {
-        if (doc.data()["selectLevel"] == selectLevel) {
-          AdminData.fromJson(doc.data());
-          tempList.add(doc.data());
-          docId.add(doc.id);
-        }
-      }
-    }).onError(
-      (error, stackTrace) {
-        print(error);
-      },
-    );
-  }
-
-  void choiceId() async {
     tempList2.clear();
+    docId.clear();
     await db!.collection("Choices").get().then(
-      (value) {
+      (value) async {
         for (var doc in value.docs) {
-          AdminData.fromJson(doc.data());
-          tempList2.add(doc.data()["documentId"]);
-          print(doc.data()["documentId"]);
+          if (doc.data()["email"] == FirebaseAuth.instance.currentUser!.email) {
+            if (doc.data()["status"] == true) {
+              selectSchedule = true;
+              planDocId = doc.id;
+              tempList2.add("${doc.data()["documentId"]}");
+            }
+          } else {}
+        }
+      },
+    );
+    await db!.collection("Schedule").get().then(
+      (value) async {
+        for (var doc in value.docs) {
+          if (doc.data()["selectLevel"] == selectLevel) {
+            tempList.add(doc.data());
+            docId.add(doc.id);
+            // print("${doc.id}");
+          }
         }
       },
     );
   }
 
-  void viewDetails(int index) {
+  Future checkData(dynamic id) async {
+    var c = tempList2.contains(id);
+    if (c) {
+      checkSchedule = true;
+    } else {
+      checkSchedule = false;
+      //print("A $id");
+    }
+  }
+
+  void viewDetails(int index, String id) {
     showDialog(
       context: context,
       builder: (context) {
@@ -378,59 +380,59 @@ class _VisibleScreenState extends State<VisibleScreen> {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: Text("Cancel"))
+                child: Text("Cancel")),
+            selectSchedule!
+                ? TextButton(
+                    onPressed: () async {
+                      await db!
+                          .collection("Choices")
+                          .doc(planDocId)
+                          .update({"status": false})
+                          .then((_) => Fluttertoast.showToast(
+                              msg: "Training plan deactivated successfully.",
+                              toastLength: Toast.LENGTH_LONG))
+                          .catchError((error) => Fluttertoast.showToast(
+                              msg: "$error", toastLength: Toast.LENGTH_LONG));
+                      setState(() {
+                        Navigator.pop(context);
+                        selectSchedule = false;
+                      });
+                    },
+                    child: Text("Deactivate"))
+                : TextButton(
+                    onPressed: () async {
+                      print(planDocId);
+                      AddSchedule ad = AddSchedule(
+                        email: FirebaseAuth.instance.currentUser!.email,
+                        documentId: id,
+                        status: true,
+                      );
+                      await db!
+                          .collection("Choices")
+                          .add(ad.toJson())
+                          .then((_) => Fluttertoast.showToast(
+                              msg: "Success", toastLength: Toast.LENGTH_LONG))
+                          .catchError((error) => Fluttertoast.showToast(
+                              msg: "$error", toastLength: Toast.LENGTH_LONG));
+                      setState(() {
+                        Navigator.pop(context);
+                      });
+                    },
+                    child: Text("Activate")),
           ],
         );
       },
     );
   }
-
-  void update(bool value, String docI, int index) async {
-    var userE = FirebaseAuth.instance.currentUser!.email;
-    var isEx = tempList2.contains(docI);
-    if (isEx) {
-    } else {
-      AdminData admin = AdminData(
-        token: "",
-        email: FirebaseAuth.instance.currentUser!.email,
-        selectLevel: tempList[index]["selectLevel"],
-        dayOneTitle: tempList[index]["dayOneTitle"],
-        dayOneWarmUp: tempList[index]["dayOneWarmUp"],
-        dayOneDrills: tempList[index]["dayOneDrills"],
-        dayOneMainSet: tempList[index]["dayOneMainSet"],
-        dayOneCoolDown: tempList[index]["dayOneCoolDown"],
-        dayTwoTitle: tempList[index]["dayTwoTitle"],
-        dayTwoWarmUp: tempList[index]["dayTwoWarmUp"],
-        dayTwoDrills: tempList[index]["dayTwoDrills"],
-        dayTwoCoolDown: tempList[index]["dayTwoCoolDown"],
-        dayThreeTitle: tempList[index]["dayThreeTitle"],
-        dayThreeDryland: tempList[index]["dayThreeDryland"],
-        dayThreePool: tempList[index]["dayThreePool"],
-        dayThreeCoolDown: tempList[index]["dayThreeCoolDown"],
-        dayForeTitle: tempList[index]["dayForeTitle"],
-        dayFiveTitle: tempList[index]["dayFiveTitle"],
-        dayFiveWarmUp: tempList[index]["dayFiveWarmUp"],
-        dayFiveCoolDown: tempList[index]["dayFiveCoolDown"],
-        daySixTitle: tempList[index]["daySixTitle"],
-        daySixWarmUp: tempList[index]["daySixWarmUp"],
-        daySixMainSet: tempList[index]["daySixMainSet"],
-        daySixCoolDown: tempList[index]["daySixCoolDown"],
-        daySevenTitle: tempList[index]["daySevenTitle"],
-        activeStatus: true,
-        documentId: docI,
-      );
-      await db!.collection("Choices").add(admin.toJson()).then(
-            (value) {},
-          );
-    }
-  }
-
-  void chackShedule(id) {
-    var isEx = tempList2.contains(id);
-    if (isEx) {
-      schedule = true;
-    } else {
-      schedule = false;
-    }
-  }
 }
+
+// class CheckIndex extends StatelessWidget {
+//   final int? checkIndex;
+//   const CheckIndex({super.key, required this.checkIndex});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     bool? check;
+//     return const Placeholder();
+//   }
+// }
